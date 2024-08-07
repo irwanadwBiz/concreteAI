@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enum for transaction status
+enum TransactionStatus {
+  success
+  failed
+  pending
+}
+
+// Enum for defining account types
+enum AccountType {
+  CREDIT
+  DEBIT
+  LOAN
+}
+
+// Enum for defining account types
+enum CurrencyType {
+  IDR
+  USD
+}
+
+model User {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  name        String?
+  password    String
+  salt        String
+  transactions Transaction[]
+  accounts     PaymentAccount[]
+}
+
+model Transaction {
+  id                 String           @id @default(uuid())
+  amount             Float            
+  status             TransactionStatus 
+  userId             String           
+  user               User             @relation(fields: [userId], references: [id]) // Establishes the relationship
+  paymentAccountId   String
+  paymentAccount     PaymentAccount   @relation(fields: [paymentAccountId], references: [id])
+  currency           CurrencyType
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+}
+
+model PaymentAccount {
+  id            String    @id @default(uuid())
+  userId        String    // Foreign key for the User
+  user          User      @relation(fields: [userId], references: [id])
+  type          AccountType // Enum for account type (credit, debit, loan)
+  balance       Float     // Current balance of the account
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  transactions  Transaction[] // Transactions related to this account
+}
