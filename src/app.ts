@@ -14,7 +14,7 @@ import { startTransactionUpdateScheduler } from "./tasks/scheduler";
 const server = Fastify();
 
 server.register(fjwt, {
-  secret: process.env.JWT_SECRET,
+  secret: process.env.JWT_SECRET || "Fortuna Major",
 });
 
 server.addHook("preHandler", (req, res, next) => {
@@ -23,7 +23,7 @@ server.addHook("preHandler", (req, res, next) => {
 });
 
 server.register(fCookie, {
-  secret: process.env.COOKIE_SECRET,
+  secret: process.env.COOKIE_SECRET || "Alohomora",
   hook: "preHandler",
 });
 

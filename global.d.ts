@@ -18,3 +18,5 @@ declare module "@fastify/jwt" {
     user: UserPayload;
   }
 }
+declare module "node-cron";
+
