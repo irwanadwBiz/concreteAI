@@ -9,6 +9,7 @@ import { accountSchemas } from "./modules/paymentAccounts/payment-account.schema
 import { transactionSchemas } from "./modules/transactions/transaction.schema";
 import transactionRoutes from "./modules/transactions/transaction.route";
 import fastifyCors from "@fastify/cors";
+import { startTransactionUpdateScheduler } from "./tasks/scheduler";
 
 const server = Fastify();
 
@@ -100,6 +101,7 @@ async function main() {
 
   try {
     await server.listen({ port: 3000, host: "0.0.0.0" });
+    startTransactionUpdateScheduler();
     console.log("Server listening at http://localhost:3000");
   } catch (error) {
     console.error(error);
