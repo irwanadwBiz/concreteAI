@@ -1,9 +1,11 @@
 import Fastify from "fastify";
 import userRoutes from "./modules/users/user.route";
-import { userSchemas } from "./modules/users/user.schema";
 import fjwt, { FastifyJWT } from "@fastify/jwt";
 import fCookie from "@fastify/cookie";
 import { FastifyReply, FastifyRequest } from "fastify";
+import paymentAccountRoutes from "./modules/paymentAccounts/payment-account.route";
+import { userSchemas } from "./modules/users/user.schema";
+import { accountSchemas } from "./modules/paymentAccounts/payment-account.schema";
 
 const server = Fastify();
 
@@ -27,12 +29,10 @@ server.decorate(
     const token = request.cookies.access_token;
 
     if (!token) {
-      return reply
-        .status(401)
-        .send({
-          message: "Authentication required",
-          error: "Forbidden Access this route",
-        });
+      return reply.status(401).send({
+        message: "Authentication required",
+        error: "Forbidden Access this route",
+      });
     }
 
     const decoded = request.jwt.verify(token);
@@ -41,12 +41,13 @@ server.decorate(
 );
 
 async function main() {
-  for (const schema of userSchemas) {
-    // should be add these schemas before you register your routes
+  for (const schema of [...userSchemas, ...accountSchemas]) {
     server.addSchema(schema);
   }
-
+ 
   server.register(userRoutes, { prefix: "api/users" });
+  server.register(paymentAccountRoutes, { prefix: "api/payment-account" });
+
   try {
     await server.listen({ port: 3000, host: "0.0.0.0" });
     console.log("Server listening at http://localhost:3000");

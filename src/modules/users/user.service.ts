@@ -58,6 +58,7 @@ export async function loginUser(input: LoginInput) {
 export async function getProfile(input: GetProfileInput) {
   const user = await db.user.findUnique({
     where: { id: input.id },
+    include: { accounts: true },
   });
 
   if (!user) {

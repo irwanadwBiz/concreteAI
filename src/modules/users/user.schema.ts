@@ -1,5 +1,12 @@
 import * as z from "zod";
 import { buildJsonSchemas } from "fastify-zod";
+import { AccountType } from "@prisma/client"; // Importing the enum from the generated Prisma client
+
+const accountSchema = z.object({
+  id: z.string(),
+  type: z.nativeEnum(AccountType),
+  balance: z.number(),
+});
 
 const userCore = {
   // define the common user schema
@@ -10,6 +17,7 @@ const userCore = {
     })
     .email(),
   name: z.string(),
+  accounts: z.array(accountSchema),
 };
 
 const createUserSchema = z.object({
