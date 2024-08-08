@@ -8,6 +8,7 @@ import { userSchemas } from "./modules/users/user.schema";
 import { accountSchemas } from "./modules/paymentAccounts/payment-account.schema";
 import { transactionSchemas } from "./modules/transactions/transaction.schema";
 import transactionRoutes from "./modules/transactions/transaction.route";
+import fastifyCors from "@fastify/cors";
 
 const server = Fastify();
 
@@ -58,10 +59,6 @@ async function main() {
     server.addSchema(schema);
   }
 
-  server.register(userRoutes, { prefix: "api/users" });
-  server.register(paymentAccountRoutes, { prefix: "api/payment-account" });
-  server.register(transactionRoutes, { prefix: "api/transaction" });
-
   server.register(require("@fastify/swagger"), {
     routePrefix: "/swagger", // Ensure this doesn't conflict with other routes
     swagger: {
@@ -85,6 +82,14 @@ async function main() {
     },
     exposeRoute: true,
   });
+  server.register(fastifyCors, {
+    // Adjust the options as needed for your environment
+    origin: true, // Reflect the request origin or set to true to allow all
+    methods: ["GET", "PUT", "POST", "DELETE"], // Allowable methods
+  });
+  server.register(userRoutes, { prefix: "api/users" });
+  server.register(paymentAccountRoutes, { prefix: "api/payment-account" });
+  server.register(transactionRoutes, { prefix: "api/transaction" });
 
   // Executes Swagger
   server.ready((err) => {
@@ -92,6 +97,7 @@ async function main() {
     server.swagger();
   });
   await server.ready();
+
   try {
     await server.listen({ port: 3000, host: "0.0.0.0" });
     console.log("Server listening at http://localhost:3000");
